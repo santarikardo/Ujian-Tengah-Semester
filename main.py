@@ -1,5 +1,10 @@
 from fastapi import FastAPI
 from modules.routes import auth, clinics, doctors, queues, visits, statistics
+from modules.items.users import users_db
+from modules.items.clinics import clinics_db
+from modules.items.doctors import doctors_db
+from modules.items.queues import queues_db
+
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -28,4 +33,26 @@ async def root():
         "version": "1.0.0",
         "status": "running",
         "documentation": "/docs"
+    }
+
+@app.get("/health", tags=["System"])
+async def health_check():
+    """
+    Health check endpoint - Status sistem
+    """
+    from modules.schema.schemas import QueueStatus
+    
+    active_queues = len([q for q in queues_db.values() 
+                        if q.status in [QueueStatus.WAITING, QueueStatus.IN_SERVICE]])
+    
+    return {
+        "status": "healthy",
+        "storage_type": "In-Memory",
+        "statistics": {
+            "total_users": len(users_db),
+            "total_clinics": len(clinics_db),
+            "total_doctors": len(doctors_db),
+            "active_queues": active_queues,
+            "total_queues": len(queues_db)
+        }
     }
