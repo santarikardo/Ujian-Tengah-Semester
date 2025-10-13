@@ -5,7 +5,6 @@ from modules.items import users, clinics, doctors, queues, visits
 
 @pytest.fixture
 def client():
-    """Fixture untuk menyediakan TestClient dari FastAPI app"""
     with TestClient(app) as c:
         yield c
 

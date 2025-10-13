@@ -5,22 +5,21 @@ from datetime import datetime, timedelta
 from modules.schema.schemas import User, UserRole
 
 
-users_db: Dict[str, User] = {}  # {user_id: User}
-passwords_db: Dict[str, str] = {}  # {user_id: hashed_password}
-sessions_db: Dict[str, Dict] = {}  # {session_token: {user_id, expires_at}}
-
+users_db: Dict[str, User] = {}  
+passwords_db: Dict[str, str] = {}  
+sessions_db: Dict[str, Dict] = {}  
 
 def hash_password(password: str) -> str:
-    """Hash password menggunakan SHA256"""
+    
     return hashlib.sha256(password.encode()).hexdigest()
 
 
 def generate_session_token() -> str:
-    """Generate session token unik"""
+    
     return str(uuid.uuid4())
 
 
-# ===== CRUD OPERATIONS =====
+
 def create_user(name: str, email: str, password: str, phone: str, role: UserRole = UserRole.PATIENT) -> User:
     if any(u.email == email for u in users_db.values()):
         raise ValueError("Email sudah terdaftar")

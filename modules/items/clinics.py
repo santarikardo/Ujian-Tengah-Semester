@@ -2,7 +2,6 @@ import uuid
 from typing import Optional, List, Dict
 from datetime import datetime
 from modules.schema.schemas import Clinic
-from modules.items.doctors import doctors_db
 
 clinics_db: Dict[str, Clinic] = {}
 
@@ -44,6 +43,9 @@ def update_clinic(clinic_id: str, **kwargs) -> Optional[Clinic]:
 
 
 def delete_clinic(clinic_id: str) -> bool:
+    
+    from modules.items.doctors import doctors_db
+
     doctors_in_clinic = [d for d in doctors_db.values() if d.clinic_id == clinic_id]
     if doctors_in_clinic:
         raise ValueError("Tidak dapat menghapus klinik yang masih memiliki dokter")

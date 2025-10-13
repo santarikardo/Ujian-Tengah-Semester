@@ -4,7 +4,7 @@ from datetime import datetime, date
 from modules.schema.schemas import VisitHistory
 
 
-visits_db: Dict[str, VisitHistory] = {}  # {visit_id: VisitHistory}
+visits_db: Dict[str, VisitHistory] = {}  
 
 def create_visit(queue_id: str, 
                 patient_id: str, 

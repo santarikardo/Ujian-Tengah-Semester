@@ -5,8 +5,6 @@ from modules.items.clinics import clinics_db
 from modules.items.doctors import doctors_db
 from modules.items.queues import queues_db
 
-
-# Initialize FastAPI app
 app = FastAPI(
     title="Hospital Queue Management System",
     description="API untuk manajemen antrean pasien rumah sakit",
@@ -15,7 +13,6 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Include all routers
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
 app.include_router(clinics.router, prefix="/api/clinics", tags=["Clinics"])
 app.include_router(doctors.router, prefix="/api/doctors", tags=["Doctors"])
@@ -25,9 +22,6 @@ app.include_router(statistics.router, prefix="/api/statistics", tags=["Statistic
 
 @app.get("/", tags=["System"])
 async def root():
-    """
-    Root endpoint - Informasi API
-    """
     return {
         "message": "Hospital Queue Management System API",
         "version": "1.0.0",
@@ -37,9 +31,6 @@ async def root():
 
 @app.get("/health", tags=["System"])
 async def health_check():
-    """
-    Health check endpoint - Status sistem
-    """
     from modules.schema.schemas import QueueStatus
     
     active_queues = len([q for q in queues_db.values() 
