@@ -16,7 +16,7 @@ async def create_doctor(data: DoctorCreate, current_user: User = Depends(require
             clinic_id=data.clinic_id,
             phone=data.phone
         )
-        return {"message": "Dokter berhasil ditambahkan", "doctor": doctor}
+        return {"message": "Doctor added", "doctor": doctor}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -32,7 +32,7 @@ async def get_all_doctors(clinic_id: Optional[str] = None,
 async def get_doctor(doctor_id: str):
     doctor = doctor_crud.read_doctor(doctor_id)
     if not doctor:
-        raise HTTPException(status_code=404, detail="Dokter tidak ditemukan")
+        raise HTTPException(status_code=404, detail="Doctor not found")
     return {"doctor": doctor}
 
 
@@ -49,8 +49,8 @@ async def update_doctor(doctor_id: str, data: DoctorUpdate,
             is_available=data.is_available
         )
         if not doctor:
-            raise HTTPException(status_code=404, detail="Dokter tidak ditemukan")
-        return {"message": "Dokter berhasil diupdate", "doctor": doctor}
+            raise HTTPException(status_code=404, detail="Doctor not found")
+        return {"message": "Doctor updated", "doctor": doctor}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -59,5 +59,5 @@ async def update_doctor(doctor_id: str, data: DoctorUpdate,
 async def delete_doctor(doctor_id: str, current_user: User = Depends(require_admin)):
     success = doctor_crud.delete_doctor(doctor_id)
     if not success:
-        raise HTTPException(status_code=404, detail="Dokter tidak ditemukan")
-    return {"message": "Dokter berhasil dihapus"}
+        raise HTTPException(status_code=404, detail="Doctor not found")
+    return {"message": "Doctor removed"}
