@@ -34,7 +34,7 @@ def update_clinic(clinic_id: str, **kwargs) -> Optional[Clinic]:
     if not clinic:
         return None
     
-    # Update fields
+    
     for key, value in kwargs.items():
         if hasattr(clinic, key) and value is not None:
             setattr(clinic, key, value)
