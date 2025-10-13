@@ -1,8 +1,3 @@
-"""
-modules/routes/clinics.py
-Clinic CRUD endpoints
-"""
-
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
 from modules.schema.schemas import ClinicCreate, ClinicUpdate, User
@@ -14,19 +9,6 @@ router = APIRouter()
 
 @router.post("", status_code=201)
 async def create_clinic(data: ClinicCreate, current_user: User = Depends(require_admin)):
-    """
-    POST - Tambah klinik baru (Admin only)
-    
-    Headers:
-        X-Session-Token: Admin session token
-    
-    Request Body:
-        - name: Nama klinik
-        - description: Deskripsi klinik (optional)
-    
-    Returns:
-        Clinic object yang baru dibuat
-    """
     try:
         clinic = clinic_crud.create_clinic(
             name=data.name,
@@ -39,30 +21,12 @@ async def create_clinic(data: ClinicCreate, current_user: User = Depends(require
 
 @router.get("")
 async def get_all_clinics(is_active: Optional[bool] = None):
-    """
-    GET - Dapatkan semua klinik
-    
-    Query Parameters:
-        - is_active: Filter berdasarkan status aktif (optional)
-    
-    Returns:
-        List of Clinic objects
-    """
     clinics = clinic_crud.read_all_clinics(is_active=is_active)
     return {"clinics": clinics, "total": len(clinics)}
 
 
 @router.get("/{clinic_id}")
 async def get_clinic(clinic_id: str):
-    """
-    GET - Dapatkan detail klinik berdasarkan ID
-    
-    Path Parameters:
-        - clinic_id: ID klinik
-    
-    Returns:
-        Clinic object
-    """
     clinic = clinic_crud.read_clinic(clinic_id)
     if not clinic:
         raise HTTPException(status_code=404, detail="Klinik tidak ditemukan")
@@ -72,23 +36,6 @@ async def get_clinic(clinic_id: str):
 @router.put("/{clinic_id}")
 async def update_clinic(clinic_id: str, data: ClinicUpdate, 
                        current_user: User = Depends(require_admin)):
-    """
-    PUT - Update klinik (Admin only)
-    
-    Headers:
-        X-Session-Token: Admin session token
-    
-    Path Parameters:
-        - clinic_id: ID klinik
-    
-    Request Body:
-        - name: Nama klinik baru (optional)
-        - description: Deskripsi baru (optional)
-        - is_active: Status aktif (optional)
-    
-    Returns:
-        Clinic object yang sudah diupdate
-    """
     try:
         clinic = clinic_crud.update_clinic(
             clinic_id=clinic_id,
@@ -105,18 +52,6 @@ async def update_clinic(clinic_id: str, data: ClinicUpdate,
 
 @router.delete("/{clinic_id}")
 async def delete_clinic(clinic_id: str, current_user: User = Depends(require_admin)):
-    """
-    DELETE - Hapus klinik (Admin only)
-    
-    Headers:
-        X-Session-Token: Admin session token
-    
-    Path Parameters:
-        - clinic_id: ID klinik
-    
-    Returns:
-        Success message
-    """
     try:
         success = clinic_crud.delete_clinic(clinic_id)
         if not success:

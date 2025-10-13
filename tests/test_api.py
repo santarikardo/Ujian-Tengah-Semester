@@ -1,35 +1,23 @@
-"""
-tests/test_api.py
-Unit Tests untuk Hospital Queue Management System
-Versi Sederhana - Cukup untuk memenuhi requirement UTS
-"""
 
-import pytest
-
-
-# ====================== SYSTEM HEALTH TESTS ======================
 class TestSystem:
-    """Test basic system endpoints"""
     
     def test_root_endpoint(self, client):
-        """Test root endpoint bisa diakses"""
+        
         response = client.get("/")
         assert response.status_code == 200
         assert "Hospital Queue Management System API" in response.json()["message"]
     
     def test_health_check(self, client):
-        """Test health check endpoint"""
+        
         response = client.get("/health")
         assert response.status_code == 200
         assert response.json()["status"] == "healthy"
 
 
-# ====================== AUTHENTICATION TESTS ======================
 class TestAuthentication:
-    """Test authentication: register, login, logout"""
     
     def test_register_patient_success(self, client):
-        """Test register patient berhasil"""
+        
         response = client.post("/api/auth/register", json={
             "name": "Test Patient",
             "email": "patient@test.com",
@@ -45,8 +33,7 @@ class TestAuthentication:
         assert data["user"]["medical_record_number"] is not None
     
     def test_login_success(self, client):
-        """Test login berhasil setelah register"""
-        # Register
+        
         client.post("/api/auth/register", json={
             "name": "Test User",
             "email": "user@test.com",
@@ -55,7 +42,6 @@ class TestAuthentication:
             "role": "patient"
         })
         
-        # Login
         response = client.post("/api/auth/login", json={
             "email": "user@test.com",
             "password": "password123"
@@ -67,8 +53,7 @@ class TestAuthentication:
         assert data["user"]["email"] == "user@test.com"
     
     def test_login_wrong_password(self, client):
-        """Test login dengan password salah"""
-        # Register
+        
         client.post("/api/auth/register", json={
             "name": "Test User",
             "email": "user@test.com",
@@ -77,7 +62,6 @@ class TestAuthentication:
             "role": "patient"
         })
         
-        # Login dengan password salah
         response = client.post("/api/auth/login", json={
             "email": "user@test.com",
             "password": "wrongpassword"
@@ -86,13 +70,10 @@ class TestAuthentication:
         assert response.status_code == 401
 
 
-# ====================== CLINIC TESTS ======================
 class TestClinics:
-    """Test CRUD operations untuk Clinic"""
     
     def test_create_clinic(self, client):
-        """Test CREATE clinic (Admin only)"""
-        # Setup admin
+        
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -101,7 +82,6 @@ class TestClinics:
             "email": "admin@test.com", "password": "admin123"
         }).json()["session_token"]
         
-        # Create clinic
         response = client.post(
             "/api/clinics",
             headers={"X-Session-Token": token},
@@ -112,7 +92,7 @@ class TestClinics:
         assert response.json()["clinic"]["name"] == "Klinik Umum"
     
     def test_get_all_clinics(self, client):
-        """Test READ all clinics"""
+
         response = client.get("/api/clinics")
         
         assert response.status_code == 200
@@ -120,8 +100,7 @@ class TestClinics:
         assert "total" in response.json()
     
     def test_update_clinic(self, client):
-        """Test UPDATE clinic"""
-        # Setup
+
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -136,7 +115,6 @@ class TestClinics:
             json={"name": "Klinik Test"}
         ).json()["clinic"]
         
-        # Update
         response = client.put(
             f"/api/clinics/{clinic['id']}",
             headers={"X-Session-Token": token},
@@ -147,8 +125,7 @@ class TestClinics:
         assert response.json()["clinic"]["name"] == "Klinik Updated"
     
     def test_delete_clinic(self, client):
-        """Test DELETE clinic"""
-        # Setup
+        
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -163,7 +140,6 @@ class TestClinics:
             json={"name": "Klinik Test"}
         ).json()["clinic"]
         
-        # Delete
         response = client.delete(
             f"/api/clinics/{clinic['id']}",
             headers={"X-Session-Token": token}
@@ -173,13 +149,9 @@ class TestClinics:
         assert "berhasil dihapus" in response.json()["message"]
 
 
-# ====================== DOCTOR TESTS ======================
 class TestDoctors:
-    """Test CRUD operations untuk Doctor"""
     
     def test_create_doctor(self, client):
-        """Test CREATE doctor"""
-        # Setup admin dan clinic
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -194,7 +166,6 @@ class TestDoctors:
             json={"name": "Klinik Test"}
         ).json()["clinic"]
         
-        # Create doctor
         response = client.post(
             "/api/doctors",
             headers={"X-Session-Token": token},
@@ -210,15 +181,12 @@ class TestDoctors:
         assert response.json()["doctor"]["name"] == "Dr. Ahmad"
     
     def test_get_all_doctors(self, client):
-        """Test READ all doctors"""
         response = client.get("/api/doctors")
         
         assert response.status_code == 200
         assert "doctors" in response.json()
     
     def test_update_doctor(self, client):
-        """Test UPDATE doctor"""
-        # Setup
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -244,7 +212,6 @@ class TestDoctors:
             }
         ).json()["doctor"]
         
-        # Update
         response = client.put(
             f"/api/doctors/{doctor['id']}",
             headers={"X-Session-Token": token},
@@ -255,8 +222,7 @@ class TestDoctors:
         assert response.json()["doctor"]["name"] == "Dr. Updated"
     
     def test_delete_doctor(self, client):
-        """Test DELETE doctor"""
-        # Setup
+    
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -282,7 +248,6 @@ class TestDoctors:
             }
         ).json()["doctor"]
         
-        # Delete
         response = client.delete(
             f"/api/doctors/{doctor['id']}",
             headers={"X-Session-Token": token}
@@ -291,13 +256,9 @@ class TestDoctors:
         assert response.status_code == 200
 
 
-# ====================== QUEUE MANAGEMENT TESTS ======================
 class TestQueueManagement:
-    """Test queue management: register, call, complete"""
     
     def test_patient_register_queue(self, client):
-        """Test patient bisa register queue"""
-        # Setup: admin, clinic, patient
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -320,7 +281,6 @@ class TestQueueManagement:
             "email": "patient@test.com", "password": "patient123"
         }).json()["session_token"]
         
-        # Register queue
         response = client.post(
             "/api/queues/register",
             headers={"X-Session-Token": patient_token},
@@ -333,8 +293,7 @@ class TestQueueManagement:
         assert "queue_number" in data["queue"]
     
     def test_complete_queue_flow(self, client):
-        """Test complete flow: register -> call -> complete"""
-        # Setup: admin, clinic, doctor, patient
+        
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -365,7 +324,6 @@ class TestQueueManagement:
             "email": "doctor@test.com", "password": "doctor123"
         }).json()["session_token"]
         
-        # 1. Register queue
         queue_response = client.post(
             "/api/queues/register",
             headers={"X-Session-Token": patient_token},
@@ -374,7 +332,6 @@ class TestQueueManagement:
         queue = queue_response.json()["queue"]
         assert queue["status"] == "menunggu"
         
-        # 2. Call queue
         call_response = client.patch(
             f"/api/queues/{queue['id']}/call",
             headers={"X-Session-Token": doctor_token}
@@ -382,7 +339,6 @@ class TestQueueManagement:
         assert call_response.status_code == 200
         assert call_response.json()["queue"]["status"] == "sedang_dilayani"
         
-        # 3. Complete queue
         complete_response = client.patch(
             f"/api/queues/{queue['id']}/complete?diagnosis=Flu&treatment=Paracetamol",
             headers={"X-Session-Token": doctor_token}
@@ -391,14 +347,9 @@ class TestQueueManagement:
         assert complete_response.json()["queue"]["status"] == "selesai"
         assert "visit_history" in complete_response.json()
 
-
-# ====================== VISIT HISTORY TESTS ======================
 class TestVisitHistory:
-    """Test visit history functionality"""
     
     def test_visit_history_auto_created(self, client):
-        """Test visit history otomatis dibuat saat queue complete"""
-        # Setup lengkap
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -429,7 +380,6 @@ class TestVisitHistory:
             "email": "doctor@test.com", "password": "doctor123"
         }).json()["session_token"]
         
-        # Register and complete queue
         queue = client.post(
             "/api/queues/register",
             headers={"X-Session-Token": patient_token},
@@ -446,7 +396,6 @@ class TestVisitHistory:
             headers={"X-Session-Token": doctor_token}
         )
         
-        # Check visit history
         response = client.get(
             "/api/visit-history",
             headers={"X-Session-Token": patient_token}
@@ -458,13 +407,9 @@ class TestVisitHistory:
         assert data["visit_history"][0]["diagnosis"] == "Flu"
 
 
-# ====================== STATISTICS TESTS ======================
 class TestStatistics:
-    """Test statistics endpoints"""
     
     def test_queue_summary(self, client):
-        """Test queue summary statistics"""
-        # Setup admin
         client.post("/api/auth/register", json={
             "name": "Admin", "email": "admin@test.com",
             "password": "admin123", "phone": "08123456789", "role": "admin"
@@ -473,7 +418,6 @@ class TestStatistics:
             "email": "admin@test.com", "password": "admin123"
         }).json()["session_token"]
         
-        # Get statistics
         response = client.get(
             "/api/statistics/queue-summary",
             headers={"X-Session-Token": admin_token}

@@ -1,8 +1,3 @@
-"""
-tests/conftest.py
-Pytest configuration - Versi Sederhana untuk UTS
-"""
-
 import pytest
 from fastapi.testclient import TestClient
 from main import app
@@ -17,11 +12,6 @@ def client():
 
 @pytest.fixture(autouse=True)
 def clear_all_data():
-    """
-    Fixture yang otomatis clear semua data sebelum dan sesudah setiap test
-    Memastikan setiap test berjalan dengan data bersih
-    """
-    # Clear before test
     users.users_db.clear()
     users.passwords_db.clear()
     users.sessions_db.clear()
@@ -31,9 +21,8 @@ def clear_all_data():
     queues.queue_counters.clear()
     visits.visits_db.clear()
     
-    yield  # Test berjalan di sini
+    yield
     
-    # Clear after test
     users.users_db.clear()
     users.passwords_db.clear()
     users.sessions_db.clear()
@@ -46,8 +35,4 @@ def clear_all_data():
 
 @pytest.fixture
 def client():
-    """
-    Fixture untuk FastAPI TestClient
-    Digunakan untuk melakukan HTTP requests ke API
-    """
     return TestClient(app)

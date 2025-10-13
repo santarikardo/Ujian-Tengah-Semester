@@ -17,7 +17,6 @@ class QueueStatus(str, Enum):
     CANCELLED = "dibatalkan"
 
 
-# ===== DATA MODELS =====
 class User(BaseModel):
     id: str
     name: str
@@ -86,7 +85,6 @@ class VisitHistory(BaseModel):
     service_status: str
 
 
-# ===== REQUEST SCHEMAS =====
 class RegisterRequest(BaseModel):
     name: str
     email: EmailStr
