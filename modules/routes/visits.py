@@ -37,9 +37,9 @@ async def get_all_visits(patient_id: Optional[str] = None,
 async def get_visit(visit_id: str, current_user: User = Depends(get_current_user)):
     visit = visit_crud.read_visit(visit_id)
     if not visit:
-        raise HTTPException(status_code=404, detail="Visit history not found")
+        raise HTTPException(status_code=404, detail="Riwayat kunjungan tidak ditemukan")
     
     if current_user.role == UserRole.PATIENT and visit.patient_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You don`t have permission to access this visit history.")
+        raise HTTPException(status_code=403, detail="Tidak memiliki akses ke riwayat kunjungan ini")
     
     return {"visit_history": visit}
