@@ -2,14 +2,14 @@ import uuid
 from typing import Optional, List, Dict
 from datetime import datetime
 from modules.schema.schemas import Queue, QueueStatus
-from modules.items.clinics import clinics_db
-from modules.items.doctors import doctors_db
 
 
 queues_db: Dict[str, Queue] = {}  
 queue_counters: Dict[str, int] = {} 
 
 def create_queue(patient_id: str, patient_name: str, clinic_id: str, doctor_id: Optional[str] = None) -> Queue:
+    from modules.items.clinics import clinics_db
+    from modules.items.doctors import doctors_db
     clinic = clinics_db.get(clinic_id)
     if not clinic or not clinic.is_active:
         raise ValueError("Klinik tidak ditemukan atau tidak aktif")

@@ -2,12 +2,13 @@ import uuid
 from typing import Optional, List, Dict
 from datetime import datetime
 from modules.schema.schemas import Doctor
-from modules.items.clinics import clinics_db
 
 
 doctors_db: Dict[str, Doctor] = {}
 
 def create_doctor(name: str, specialization: str, clinic_id: str, phone: str) -> Doctor:
+    
+    from modules.items.clinics import clinics_db
     
     clinic = clinics_db.get(clinic_id)
     if not clinic:
