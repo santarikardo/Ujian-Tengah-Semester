@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from modules.routes import auth, clinics, doctors, queues, visits, statistics
 from modules.items.users import users_db
 from modules.items.clinics import clinics_db
@@ -19,6 +19,10 @@ app.include_router(doctors.router, prefix="/api/doctors", tags=["Doctors"])
 app.include_router(queues.router, prefix="/api/queues", tags=["Queue Management"])
 app.include_router(visits.router, prefix="/api/visit-history", tags=["Visit History"])
 app.include_router(statistics.router, prefix="/api/statistics", tags=["Statistics"])
+
+@app.get("/favicon.ico")
+async def favicon():
+    return Response(status_code=204)
 
 @app.get("/", tags=["System"])
 async def root():
