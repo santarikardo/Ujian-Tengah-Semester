@@ -1,8 +1,3 @@
-"""
-modules/routes/statistics.py
-Statistics endpoints
-"""
-
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional
 from datetime import datetime, date
@@ -18,31 +13,17 @@ router = APIRouter()
 @router.get("/queue-summary")
 async def get_queue_summary(clinic_id: Optional[str] = None,
                            current_user: User = Depends(require_doctor_or_admin)):
-    """
-    GET - Ringkasan statistik antrean (Doctor/Admin only)
-    
-    Headers:
-        X-Session-Token: Doctor/Admin session token
-    
-    Query Parameters:
-        - clinic_id: Filter berdasarkan klinik (optional)
-    
-    Returns:
-        Queue statistics (total, waiting, in_service, completed, cancelled, avg_service_time)
-    """
     queues = list(queues_db.values())
     
     if clinic_id:
         queues = [q for q in queues if q.clinic_id == clinic_id]
     
-    # Calculate statistics
     total = len(queues)
     waiting = len([q for q in queues if q.status == QueueStatus.WAITING])
     in_service = len([q for q in queues if q.status == QueueStatus.IN_SERVICE])
     completed = len([q for q in queues if q.status == QueueStatus.COMPLETED])
     cancelled = len([q for q in queues if q.status == QueueStatus.CANCELLED])
     
-    # Calculate average service time for completed queues
     completed_queues = [q for q in queues if q.status == QueueStatus.COMPLETED 
                        and q.service_start_time and q.service_end_time]
     
@@ -67,15 +48,6 @@ async def get_queue_summary(clinic_id: Optional[str] = None,
 
 @router.get("/clinic-density")
 async def get_clinic_density(current_user: User = Depends(require_doctor_or_admin)):
-    """
-    GET - Tingkat kepadatan antrean per klinik (Doctor/Admin only)
-    
-    Headers:
-        X-Session-Token: Doctor/Admin session token
-    
-    Returns:
-        List of clinic density data (sorted by active_patients descending)
-    """
     clinics = list(clinics_db.values())
     density_data = []
     
@@ -93,7 +65,6 @@ async def get_clinic_density(current_user: User = Depends(require_doctor_or_admi
             "active_patients": waiting + in_service
         })
     
-    # Sort by active patients (descending)
     density_data.sort(key=lambda x: x["active_patients"], reverse=True)
     
     return {"clinic_density": density_data}
@@ -102,24 +73,11 @@ async def get_clinic_density(current_user: User = Depends(require_doctor_or_admi
 @router.get("/daily-visits")
 async def get_daily_visits(visit_date: Optional[date] = None,
                           current_user: User = Depends(require_doctor_or_admin)):
-    """
-    GET - Statistik kunjungan harian (Doctor/Admin only)
-    
-    Headers:
-        X-Session-Token: Doctor/Admin session token
-    
-    Query Parameters:
-        - visit_date: Tanggal tertentu (optional, format: YYYY-MM-DD, default: hari ini)
-    
-    Returns:
-        Daily visit statistics grouped by clinic
-    """
     target_date = visit_date or date.today()
     
     visits = [v for v in visits_db.values() 
              if v.visit_date == target_date.isoformat()]
     
-    # Group by clinic
     clinic_visits = {}
     for visit in visits:
         if visit.clinic_id not in clinic_visits:
