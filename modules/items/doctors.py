@@ -12,7 +12,7 @@ def create_doctor(name: str, specialization: str, clinic_id: str, phone: str) ->
     
     clinic = clinics_db.get(clinic_id)
     if not clinic:
-        raise ValueError("Clinic not found")
+        raise ValueError("Klinik tidak ditemukan")
     
     doctor = Doctor(
         id=str(uuid.uuid4()),
@@ -53,7 +53,7 @@ def update_doctor(doctor_id: str, **kwargs) -> Optional[Doctor]:
         from modules.items.clinics import clinics_db
         clinic = clinics_db.get(kwargs["clinic_id"])
         if not clinic:
-            raise ValueError("Clinic not found")
+            raise ValueError("Klinik tidak ditemukan")
         kwargs["clinic_name"] = clinic.name
     
     for key, value in kwargs.items():

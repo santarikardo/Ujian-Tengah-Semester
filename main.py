@@ -8,7 +8,7 @@ from modules.items.queues import queues_db
 app = FastAPI(
     title="Hospital Queue Management System",
     description="API for hospital queue management system",
-    version="1.2.1",
+    version="1.2.2",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -28,7 +28,7 @@ async def favicon():
 async def root():
     return {
         "message": "Hospital Queue Management System API",
-        "version": "1.2.1",
+        "version": "1.2.2",
         "status": "running",
         "documentation": "/docs"
     }

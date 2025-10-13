@@ -48,7 +48,7 @@ def delete_clinic(clinic_id: str) -> bool:
 
     doctors_in_clinic = [d for d in doctors_db.values() if d.clinic_id == clinic_id]
     if doctors_in_clinic:
-        raise ValueError("Cannot remove a clinic that still has doctors")
+        raise ValueError("Tidak dapat menghapus klinik yang masih memiliki dokter")
     
     if clinic_id in clinics_db:
         del clinics_db[clinic_id]

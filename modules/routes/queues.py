@@ -12,7 +12,7 @@ router = APIRouter()
 async def register_queue(data: QueueRegisterRequest, 
                         current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.PATIENT:
-        raise HTTPException(status_code=403, detail="Queue registration is restricted to patients only.")
+        raise HTTPException(status_code=403, detail="Hanya pasien yang dapat mendaftar antrean")
     
     try:
         queue = queue_crud.create_queue(
@@ -25,7 +25,7 @@ async def register_queue(data: QueueRegisterRequest,
         position = queue_crud.get_queue_position(queue.id)
         
         return {
-            "message": "Queue registration successful.",
+            "message": "Pendaftaran antrean berhasil",
             "queue": queue,
             "position": position
         }
@@ -48,7 +48,7 @@ async def get_all_queues(clinic_id: Optional[str] = None,
 @router.get("/my-position")
 async def get_my_position(current_user: User = Depends(get_current_user)):
     if current_user.role != UserRole.PATIENT:
-        raise HTTPException(status_code=403, detail="Access to this endpoint is restricted to patients.")
+        raise HTTPException(status_code=403, detail="Endpoint ini hanya untuk pasien")
     
     user_queues = queue_crud.read_all_queues(
         patient_id=current_user.id,
@@ -56,7 +56,7 @@ async def get_my_position(current_user: User = Depends(get_current_user)):
     )
     
     if not user_queues:
-        return {"message": "No active queues found.", "position": None}
+        return {"message": "Tidak ada antrean aktif", "position": None}
     
     queue = user_queues[0]
     position = queue_crud.get_queue_position(queue.id)
@@ -78,10 +78,10 @@ async def get_my_position(current_user: User = Depends(get_current_user)):
 async def get_queue(queue_id: str, current_user: User = Depends(get_current_user)):
     queue = queue_crud.read_queue(queue_id)
     if not queue:
-        raise HTTPException(status_code=404, detail="No active queues found.")
+        raise HTTPException(status_code=404, detail="Antrean tidak ditemukan")
     
     if current_user.role == UserRole.PATIENT and queue.patient_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You don`t have permission to access this queue.")
+        raise HTTPException(status_code=403, detail="Tidak memiliki akses ke antrean ini")
     
     return {"queue": queue}
 
@@ -90,13 +90,13 @@ async def get_queue(queue_id: str, current_user: User = Depends(get_current_user
 async def call_queue(queue_id: str, current_user: User = Depends(require_doctor_or_admin)):
     queue = queue_crud.read_queue(queue_id)
     if not queue:
-        raise HTTPException(status_code=404, detail="No queue found.")
+        raise HTTPException(status_code=404, detail="Antrean tidak ditemukan")
     
     if queue.status != QueueStatus.WAITING:
-        raise HTTPException(status_code=400, detail="This queue is no longer waiting.")
+        raise HTTPException(status_code=400, detail="Antrean tidak dalam status menunggu")
     
     updated_queue = queue_crud.update_queue_status(queue_id, QueueStatus.IN_SERVICE)
-    return {"message": "Successfully called the patient.", "queue": updated_queue}
+    return {"message": "Pasien berhasil dipanggil", "queue": updated_queue}
 
 
 @router.patch("/{queue_id}/complete")
@@ -107,10 +107,10 @@ async def complete_queue(queue_id: str,
                         current_user: User = Depends(require_doctor_or_admin)):
     queue = queue_crud.read_queue(queue_id)
     if not queue:
-        raise HTTPException(status_code=404, detail="No queue found.")
+        raise HTTPException(status_code=404, detail="Antrean tidak ditemukan")
     
     if queue.status not in [QueueStatus.IN_SERVICE, QueueStatus.WAITING]:
-        raise HTTPException(status_code=400, detail="Queue completion failed.")
+        raise HTTPException(status_code=400, detail="Antrean tidak dapat diselesaikan")
     
     updated_queue = queue_crud.update_queue_status(
         queue_id, 
@@ -132,7 +132,7 @@ async def complete_queue(queue_id: str,
     )
     
     return {
-        "message": "Successfully completed the service.",
+        "message": "Pelayanan berhasil diselesaikan",
         "queue": updated_queue,
         "visit_history": visit
     }
@@ -142,13 +142,13 @@ async def complete_queue(queue_id: str,
 async def cancel_queue(queue_id: str, current_user: User = Depends(get_current_user)):
     queue = queue_crud.read_queue(queue_id)
     if not queue:
-        raise HTTPException(status_code=404, detail="No queue found.")
+        raise HTTPException(status_code=404, detail="Antrean tidak ditemukan")
     
     if current_user.role == UserRole.PATIENT and queue.patient_id != current_user.id:
-        raise HTTPException(status_code=403, detail="You don`t have permission to access this queue.")
+        raise HTTPException(status_code=403, detail="Tidak memiliki akses ke antrean ini")
     
     if queue.status != QueueStatus.WAITING:
-        raise HTTPException(status_code=400, detail="Only queues in waiting status can be cancelled.")
+        raise HTTPException(status_code=400, detail="Hanya antrean menunggu yang dapat dibatalkan")
     
     updated_queue = queue_crud.update_queue_status(queue_id, QueueStatus.CANCELLED)
-    return {"message": "Queue successfully canceled", "queue": updated_queue}
+    return {"message": "Antrean berhasil dibatalkan", "queue": updated_queue}
