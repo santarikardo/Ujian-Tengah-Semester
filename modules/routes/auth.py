@@ -36,7 +36,7 @@ async def register(req: RegisterRequest):
             phone=req.phone,
             role=req.role
         )
-        return {"message": "Registrasi berhasil", "user": user}
+        return {"message": "Registration Succes", "user": user}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -45,12 +45,12 @@ async def register(req: RegisterRequest):
 async def login(req: LoginRequest):
     user = user_crud.read_user_by_email(req.email)
     if not user or not user_crud.verify_password(user.id, req.password):
-        raise HTTPException(status_code=401, detail="Email atau password salah")
+        raise HTTPException(status_code=401, detail="Email or password invalid")
     
     session_token, expires_at = user_crud.create_session(user.id)
     
     return {
-        "message": "Login berhasil",
+        "message": "Login succes",
         "session_token": session_token,
         "user": user,
         "expires_at": expires_at.isoformat()
@@ -61,7 +61,7 @@ async def login(req: LoginRequest):
 async def logout(current_user: User = Depends(get_current_user),
                 session_token: str = Header(..., alias="X-Session-Token")):
     user_crud.delete_session(session_token)
-    return {"message": "Logout berhasil"}
+    return {"message": "Logout succes"}
 
 
 @router.get("/me")

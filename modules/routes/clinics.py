@@ -14,7 +14,7 @@ async def create_clinic(data: ClinicCreate, current_user: User = Depends(require
             name=data.name,
             description=data.description
         )
-        return {"message": "Klinik berhasil ditambahkan", "clinic": clinic}
+        return {"message": "Clinic succesfully added", "clinic": clinic}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -29,7 +29,7 @@ async def get_all_clinics(is_active: Optional[bool] = None):
 async def get_clinic(clinic_id: str):
     clinic = clinic_crud.read_clinic(clinic_id)
     if not clinic:
-        raise HTTPException(status_code=404, detail="Klinik tidak ditemukan")
+        raise HTTPException(status_code=404, detail="Clinic not found")
     return {"clinic": clinic}
 
 
@@ -44,8 +44,8 @@ async def update_clinic(clinic_id: str, data: ClinicUpdate,
             is_active=data.is_active
         )
         if not clinic:
-            raise HTTPException(status_code=404, detail="Klinik tidak ditemukan")
-        return {"message": "Klinik berhasil diupdate", "clinic": clinic}
+            raise HTTPException(status_code=404, detail="Clinic not found")
+        return {"message": "Clinic updated", "clinic": clinic}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -55,7 +55,7 @@ async def delete_clinic(clinic_id: str, current_user: User = Depends(require_adm
     try:
         success = clinic_crud.delete_clinic(clinic_id)
         if not success:
-            raise HTTPException(status_code=404, detail="Klinik tidak ditemukan")
-        return {"message": "Klinik berhasil dihapus"}
+            raise HTTPException(status_code=404, detail="Clinic not found")
+        return {"message": "Clinic removed"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

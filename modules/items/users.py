@@ -22,7 +22,7 @@ def generate_session_token() -> str:
 
 def create_user(name: str, email: str, password: str, phone: str, role: UserRole = UserRole.PATIENT) -> User:
     if any(u.email == email for u in users_db.values()):
-        raise ValueError("Email sudah terdaftar")
+        raise ValueError("Email is already registered.")
     
     user_id = str(uuid.uuid4())
     

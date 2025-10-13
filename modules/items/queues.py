@@ -12,13 +12,13 @@ def create_queue(patient_id: str, patient_name: str, clinic_id: str, doctor_id: 
     from modules.items.doctors import doctors_db
     clinic = clinics_db.get(clinic_id)
     if not clinic or not clinic.is_active:
-        raise ValueError("Klinik tidak ditemukan atau tidak aktif")
+        raise ValueError("Clinic not found or inactive")
     
     doctor_name = None
     if doctor_id:
         doctor = doctors_db.get(doctor_id)
         if not doctor or not doctor.is_available or doctor.clinic_id != clinic_id:
-            raise ValueError("Dokter tidak ditemukan atau tidak tersedia")
+            raise ValueError("Doctor not found or unavailable")
         doctor_name = doctor.name
     
     if clinic_id not in queue_counters:
