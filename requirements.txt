@@ -1,0 +1,9 @@
+<<<<<<< Updated upstream
+=======
+fastapi
+uvicorn[standard]
+pydantic[email]
+python-multipart
+pytest
+httpx
+>>>>>>> Stashed changes
