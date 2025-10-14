@@ -1,3 +1,4 @@
+#requirements
 fastapi
 uvicorn[standard]
 pydantic[email]
