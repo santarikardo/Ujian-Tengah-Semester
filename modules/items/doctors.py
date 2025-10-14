@@ -14,12 +14,12 @@ def create_doctor(name: str, specialization: str, clinic_id: str, phone: str) ->
         raise ValueError("Klinik tidak ditemukan")
     
     if doctors_db:
-        last_nums = [int(doctor_id.split('_')[1]) for doctor_id in doctors_db.keys() if doctor_id.startswith('doctor_')]
+        last_nums = [int(doctor_id.split('-')[1]) for doctor_id in doctors_db.keys() if doctor_id.startswith('doctor-')]
         next_num = max(last_nums) + 1 if last_nums else 1
     else:
         next_num = 1
     
-    doctor_id = f"doctor_{next_num:03d}"
+    doctor_id = f"doctor-{next_num:03d}"
 
     doctor = Doctor(
         id=doctor_id,

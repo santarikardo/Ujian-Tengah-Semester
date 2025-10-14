@@ -7,12 +7,12 @@ clinics_db: Dict[str, Clinic] = {}
 def create_clinic(name: str, description: Optional[str] = None) -> Clinic:
 
     if clinics_db:
-        last_nums = [int(clinic_id.split('_')[1]) for clinic_id in clinics_db.keys() if clinic_id.startswith('clinic_')]
+        last_nums = [int(clinic_id.split('-')[1]) for clinic_id in clinics_db.keys() if clinic_id.startswith('clinic-')]
         next_num = max(last_nums) + 1 if last_nums else 1
     else:
         next_num = 1
     
-    clinic_id = f"clinic_{next_num:03d}"
+    clinic_id = f"clinic-{next_num:03d}"
 
     clinic = Clinic(
         id=clinic_id,
