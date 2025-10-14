@@ -20,9 +20,6 @@ app.include_router(queues.router, prefix="/api/queues", tags=["Queue Management"
 app.include_router(visits.router, prefix="/api/visit-history", tags=["Visit History"])
 app.include_router(statistics.router, prefix="/api/statistics", tags=["Statistics"])
 
-@app.get("/favicon.ico")
-async def favicon():
-    return Response(status_code=204)
 
 @app.get("/", tags=["System"])
 async def root():
