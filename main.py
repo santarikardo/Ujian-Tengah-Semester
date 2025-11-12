@@ -8,7 +8,7 @@ from modules.items.queues import queues_db
 app = FastAPI(
     title="Hospital Queue Management System",
     description="API for hospital queue management system",
-    version="1.2.2",
+    version="1.2.3",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -25,7 +25,7 @@ app.include_router(statistics.router, prefix="/api/statistics", tags=["Statistic
 async def root():
     return {
         "message": "Hospital Queue Management System API",
-        "version": "1.2.2",
+        "version": "1.2.3",
         "status": "running",
         "documentation": "/docs"
     }
