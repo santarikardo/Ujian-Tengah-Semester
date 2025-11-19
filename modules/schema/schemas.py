@@ -26,7 +26,8 @@ class User(BaseModel):
     medical_record_number: Optional[str] = None
     created_at: str = Field(
         ...,
-        default_factory=lambda: datetime.now().isoformat())
+        default_factory=lambda: datetime.now().isoformat()
+    )
 
 
 class Clinic(BaseModel):
@@ -36,7 +37,8 @@ class Clinic(BaseModel):
     is_active: bool = True
     created_at: str = Field(
         ...,
-        default_factory=lambda: datetime.now().isoformat())
+        default_factory=lambda: datetime.now().isoformat()
+    )
 
 
 class Doctor(BaseModel):
@@ -49,7 +51,8 @@ class Doctor(BaseModel):
     is_available: bool = True
     created_at: str = Field(
         ...,
-        default_factory=lambda: datetime.now().isoformat())
+        default_factory=lambda: datetime.now().isoformat()
+    )
 
 
 class Queue(BaseModel):
@@ -69,20 +72,46 @@ class Queue(BaseModel):
     notes: Optional[str] = None
 
 
+# -------------------- VISIT HISTORY (KUNJUNGAN / APPOINTMENT) --------------------
+
+
 class VisitHistory(BaseModel):
+    """
+    Riwayat kunjungan pasien.
+
+    Field-field di bawah ini disesuaikan dengan kolom dataset Kaggle
+    "Hospital Management System" (reason, appointment_Date, payment_amount,
+    mode_of_payment, mode_of_appointment, appointment_status)
+    tapi tetap ditambah informasi dari sistem antrean.
+    """
+
+    # identitas record di sistem
     id: str
     queue_id: str
+
+    # identitas pasien & dokter di sistem
     patient_id: str
     patient_name: str
     clinic_id: str
     clinic_name: str
     doctor_id: str
     doctor_name: str
-    visit_date: str
-    diagnosis: Optional[str] = None
-    treatment: Optional[str] = None
-    notes: Optional[str] = None
-    service_status: str
+
+    # tanggal kunjungan / appointment (dipakai juga buat filter)
+    visit_date: str = Field(
+        ...,
+        description="Tanggal kunjungan dalam format ISO yyyy-mm-dd"
+    )
+
+    # kolom yang mirip dengan dataset Kaggle
+    reason: str
+    payment_amount: float
+    mode_of_payment: str
+    mode_of_appointment: str
+
+    # hasil kunjungan pasien (label ala Kaggle)
+    # Completed / Cancelled / Scheduled / No-Show
+    appointment_status: str
 
 
 class RegisterRequest(BaseModel):
@@ -127,3 +156,11 @@ class DoctorUpdate(BaseModel):
 class QueueRegisterRequest(BaseModel):
     clinic_id: str
     doctor_id: Optional[str] = None
+
+
+# BODY UNTUK /queues/{id}/complete – PARAMETER DARI DATASET KAGGLE
+class CompleteQueueRequest(BaseModel):
+    reason: str
+    payment_amount: float
+    mode_of_payment: str
+    mode_of_appointment: str
