@@ -1,9 +1,11 @@
 from typing import Optional, List, Dict
 from datetime import datetime
 from modules.schema.schemas import Doctor
+import threading
 
 
 doctors_db: Dict[str, Doctor] = {}
+_doctor_lock = threading.Lock()
 
 def create_doctor(name: str, specialization: str, clinic_id: str, phone: str) -> Doctor:
     
@@ -13,24 +15,25 @@ def create_doctor(name: str, specialization: str, clinic_id: str, phone: str) ->
     if not clinic:
         raise ValueError("Klinik tidak ditemukan")
     
-    if doctors_db:
-        last_nums = [int(doctor_id.split('-')[1]) for doctor_id in doctors_db.keys() if doctor_id.startswith('doctor-')]
-        next_num = max(last_nums) + 1 if last_nums else 1
-    else:
-        next_num = 1
-    
-    doctor_id = f"doctor-{next_num:03d}"
+    with _doctor_lock:
+        if doctors_db:
+            last_nums = [int(doctor_id.split('-')[1]) for doctor_id in doctors_db.keys() if doctor_id.startswith('doctor-')]
+            next_num = max(last_nums) + 1 if last_nums else 1
+        else:
+            next_num = 1
+        
+        doctor_id = f"doctor-{next_num:03d}"
 
-    doctor = Doctor(
-        id=doctor_id,
-        name=name,
-        specialization=specialization,
-        clinic_id=clinic_id,
-        clinic_name=clinic.name,
-        phone=phone,
-        is_available=True,
-        created_at=datetime.now().isoformat()
-    )
+        doctor = Doctor(
+            id=doctor_id,
+            name=name,
+            specialization=specialization,
+            clinic_id=clinic_id,
+            clinic_name=clinic.name,
+            phone=phone,
+            is_available=True,
+            created_at=datetime.now().isoformat()
+        )
     
     doctors_db[doctor.id] = doctor
     return doctor

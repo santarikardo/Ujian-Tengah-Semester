@@ -2,10 +2,12 @@ import uuid
 from typing import Optional, List, Dict
 from datetime import datetime
 from modules.schema.schemas import Queue, QueueStatus
+import threading
 
 
 queues_db: Dict[str, Queue] = {}  
 queue_counters: Dict[str, int] = {} 
+_db_lock = threading.Lock()
 
 def create_queue(patient_id: str, patient_name: str, clinic_id: str, doctor_id: Optional[str] = None) -> Queue:
     from modules.items.clinics import clinics_db
@@ -21,24 +23,25 @@ def create_queue(patient_id: str, patient_name: str, clinic_id: str, doctor_id: 
             raise ValueError("Dokter tidak ditemukan atau tidak tersedia")
         doctor_name = doctor.name
     
-    if clinic_id not in queue_counters:
-        queue_counters[clinic_id] = 0
-    
-    queue_counters[clinic_id] += 1
-    queue_number = f"{clinic.name[:3].upper()}{queue_counters[clinic_id]:03d}"
-    
-    queue = Queue(
-        id=str(uuid.uuid4()),
-        queue_number=queue_number,
-        patient_id=patient_id,
-        patient_name=patient_name,
-        clinic_id=clinic_id,
-        clinic_name=clinic.name,
-        doctor_id=doctor_id,
-        doctor_name=doctor_name,
-        status=QueueStatus.WAITING,
-        registration_time=datetime.now().isoformat()
-    )
+    with _db_lock:
+        if clinic_id not in queue_counters:
+            queue_counters[clinic_id] = 0
+        
+        queue_counters[clinic_id] += 1
+        queue_number = f"{clinic.name[:3].upper()}{queue_counters[clinic_id]:03d}"
+        
+        queue = Queue(
+            id=str(uuid.uuid4()),
+            queue_number=queue_number,
+            patient_id=patient_id,
+            patient_name=patient_name,
+            clinic_id=clinic_id,
+            clinic_name=clinic.name,
+            doctor_id=doctor_id,
+            doctor_name=doctor_name,
+            status=QueueStatus.WAITING,
+            registration_time=datetime.now().isoformat()
+        )
     
     queues_db[queue.id] = queue
     return queue
@@ -60,7 +63,7 @@ def read_all_queues(clinic_id: Optional[str] = None,
     if patient_id:
         queues = [q for q in queues if q.patient_id == patient_id]
     
-    queues.sort(key=lambda x: x.registration_time)
+    queues.sort(key=lambda x: datetime.fromisoformat(x.registration_time))
     return queues
 
 

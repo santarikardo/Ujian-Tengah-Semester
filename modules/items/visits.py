@@ -52,11 +52,11 @@ def read_all_visits(patient_id: Optional[str] = None,
     if clinic_id:
         visits = [v for v in visits if v.clinic_id == clinic_id]
     if start_date:
-        visits = [v for v in visits if v.visit_date >= start_date.isoformat()]
+        visits = [v for v in visits if date.fromisoformat(v.visit_date) >= start_date]
     if end_date:
-        visits = [v for v in visits if v.visit_date <= end_date.isoformat()]
+        visits = [v for v in visits if date.fromisoformat(v.visit_date) <= end_date]
     
-    visits.sort(key=lambda x: x.visit_date, reverse=True)
+    visits.sort(key=lambda x: date.fromisoformat(x.visit_date), reverse=True)
     return visits
 
 

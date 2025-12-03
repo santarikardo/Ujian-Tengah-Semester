@@ -8,7 +8,7 @@ from modules.items.queues import queues_db
 app = FastAPI(
     title="Hospital Queue Management System",
     description="API for hospital queue management system",
-    version="1.2.3",
+    version="2.0.1",
     docs_url="/docs",
     redoc_url="/redoc"
 )

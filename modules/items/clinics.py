@@ -1,26 +1,29 @@
 from typing import Optional, List, Dict
 from datetime import datetime
 from modules.schema.schemas import Clinic
+import threading
 
 clinics_db: Dict[str, Clinic] = {}
+_clinic_lock = threading.Lock()
 
 def create_clinic(name: str, description: Optional[str] = None) -> Clinic:
 
-    if clinics_db:
-        last_nums = [int(clinic_id.split('-')[1]) for clinic_id in clinics_db.keys() if clinic_id.startswith('clinic-')]
-        next_num = max(last_nums) + 1 if last_nums else 1
-    else:
-        next_num = 1
-    
-    clinic_id = f"clinic-{next_num:03d}"
+    with _clinic_lock:
+        if clinics_db:
+            last_nums = [int(clinic_id.split('-')[1]) for clinic_id in clinics_db.keys() if clinic_id.startswith('clinic-')]
+            next_num = max(last_nums) + 1 if last_nums else 1
+        else:
+            next_num = 1
+        
+        clinic_id = f"clinic-{next_num:03d}"
 
-    clinic = Clinic(
-        id=clinic_id,
-        name=name,
-        description=description,
-        is_active=True,
-        created_at=datetime.now().isoformat()
-    )
+        clinic = Clinic(
+            id=clinic_id,
+            name=name,
+            description=description,
+            is_active=True,
+            created_at=datetime.now().isoformat()
+        )
     
     clinics_db[clinic.id] = clinic
     return clinic
